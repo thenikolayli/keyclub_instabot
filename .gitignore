@@ -1,0 +1,5 @@
+.env
+actions.log
+key.json
+current_events.json
+.venv
