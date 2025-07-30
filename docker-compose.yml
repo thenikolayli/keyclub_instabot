@@ -6,4 +6,4 @@ services:
       - ./key.json:/app/key.json
       - ./current_events.json:/app/current_events.json
     env_file: .env
-    command: pipenv run main.py
+    command: pipenv run python main.py
