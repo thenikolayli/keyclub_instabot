@@ -1,6 +1,7 @@
 # utility functions for main.py
 from PIL import Image, ImageFont
 from pilmoji import Pilmoji
+from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from cloudinary import uploader as cloudinary_uploader
 import requests, json, logging, re
@@ -127,8 +128,17 @@ def in_current_events(event_title):
 def format_time(datetime_param):
     datetime_param = datetime.fromisoformat(datetime_param).time()
     period = datetime_param.strftime("%p")
-    datetime_param = ":".join(str(datetime_param).split(":")[:2])  # removes the seconds slot from the time
-    datetime_param = f"{datetime_param} {period}"
+
+    # converts it to 12 hour time
+    hour, minute = datetime_param.hour, datetime_param.minute
+    if hour > 12:
+        hour -= 12
+    hour = str(hour)
+    # if the minute is single digit
+    if minute < 10:
+        minute = "0" + str(minute)
+    minute = str(minute)
+    datetime_param = f"{hour}:{minute} {period}"
 
     return datetime_param
 
@@ -229,9 +239,9 @@ def post_to_instagram(caption, image_url, fb_token):
         return container_id
 
 # returns a list of upcoming events that should be posted in the next 7 days
-def get_events(calendar_service, docs_service, calendar_id, tz_offset):
-    now = datetime.now(tz_offset).isoformat()
-    week = (datetime.now(tz_offset) + timedelta(days=7)).isoformat()
+def get_events(calendar_service, docs_service, calendar_id):
+    now = datetime.now(ZoneInfo("America/Los_Angeles")).isoformat()
+    week = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=7)).isoformat()
     all_events = calendar_service.events().list(calendarId=calendar_id, timeMin=now, timeMax=week).execute()
     all_events = all_events.get("items", [])
     return_events = []
@@ -281,3 +291,15 @@ def get_events(calendar_service, docs_service, calendar_id, tz_offset):
         except KeyError: pass
     logging.info("Fetched new events")
     return return_events
+
+# formatter for python logging
+class TZFormatter(logging.Formatter):
+    def __init__(self, fmt=None, datefmt=None, tz=ZoneInfo("America/Los_Angeles")):
+        super().__init__(fmt=fmt, datefmt=datefmt)
+        self.tz = tz
+
+    def formatTime(self, record, datefmt=None):
+        dt = datetime.fromtimestamp(record.created, self.tz)
+        if datefmt:
+            return dt.strftime(datefmt)
+        return dt.isoformat()
