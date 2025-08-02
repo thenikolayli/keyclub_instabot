@@ -65,7 +65,6 @@ def main():
         )
         image.save("output.jpg")
 
-        continue
         # uploads to cloudinary, gets asset id (for removal) and secure url (HTTPS url for posting)
         upload_result = cloudinary_uploader.upload(file="output.jpg", return_delete_token=True)
         public_id, secure_url = upload_result.get("public_id"), upload_result.get("secure_url")

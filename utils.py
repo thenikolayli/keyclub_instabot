@@ -262,7 +262,8 @@ def get_events(calendar_service, docs_service, calendar_id):
                 continue
             event_start = format_time(event.get("start").get("dateTime"))
             event_end = format_time(event.get("end").get("dateTime"))
-            event_date = str(datetime.fromisoformat(event.get("start").get("dateTime")).date()).replace("-", "/")
+            event_year, event_month, event_day = str(datetime.fromisoformat(event.get("start").get("dateTime")).date()).split("-")
+            event_date = f"{event_month}/{event_day}/{event_year}" # month day year!
 
             event_fullness = get_event_fullness(event_url, docs_service)
             event_priority = ""
