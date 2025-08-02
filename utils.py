@@ -290,7 +290,7 @@ def get_events(calendar_service, docs_service, calendar_id):
             })
             logging.info(f"Fetched {event_title} from get_events")
         except KeyError: pass
-    logging.info("Fetched new events")
+    logging.info(f"Fetched {len(return_events)} new events")
     return return_events
 
 # formatter for python logging
