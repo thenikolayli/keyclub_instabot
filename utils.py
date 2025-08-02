@@ -156,7 +156,7 @@ def update_current_events():
     # check if each event passed
     for event in current_events:
         # if yes, delete it. otherwise add it to the new_log
-        if datetime.strptime(event.get("event_date"), "%Y/%m/%d") < today:
+        if datetime.strptime(event.get("event_date"), "%m/%d/%Y") < today:
             cloudinary_uploader.destroy(event.get("public_id"))
             logging.info(f"Removed {event.get('event_title')} from current events")
         else:
