@@ -147,7 +147,7 @@ def format_time(datetime_param):
 
 # updates the log and removes passed events
 def update_current_events():
-    today = datetime.today()
+    today = datetime.now().date()
     new_current_events = []
 
     with open("current_events.json", "r") as file:
@@ -240,9 +240,9 @@ def post_to_instagram(caption, image_url, fb_token):
 
 # returns a list of upcoming events that should be posted in the next 7 days
 def get_events(calendar_service, docs_service, calendar_id):
-    now = datetime.now(ZoneInfo("America/Los_Angeles")).isoformat()
-    week = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=7)).isoformat()
-    all_events = calendar_service.events().list(calendarId=calendar_id, timeMin=now, timeMax=week).execute()
+    tmr = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=1)).date().isoformat()
+    week = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=7)).date().isoformat()
+    all_events = calendar_service.events().list(calendarId=calendar_id, timeMin=tmr, timeMax=week).execute()
     all_events = all_events.get("items", [])
     return_events = []
 
