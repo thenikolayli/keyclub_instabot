@@ -240,8 +240,8 @@ def post_to_instagram(caption, image_url, fb_token):
 
 # returns a list of upcoming events that should be posted in the next 7 days
 def get_events(calendar_service, docs_service, calendar_id):
-    tmr = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=1)).date().isoformat()
-    week = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=7)).date().isoformat()
+    tmr = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=1)).isoformat()
+    week = (datetime.now(ZoneInfo("America/Los_Angeles")) + timedelta(days=7)).isoformat()
     all_events = calendar_service.events().list(calendarId=calendar_id, timeMin=tmr, timeMax=week).execute()
     all_events = all_events.get("items", [])
     return_events = []

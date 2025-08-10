@@ -79,6 +79,8 @@ def main():
         print(f"Successfully uploaded {event.get('event_title')}")
         logging.info(f"Successfully posted {event.get('event_title')}")
 
+# runs main loop on startup
+main()
 # runs main every day at 3:00 PM
 scheduler = BlockingScheduler(timezone=ZoneInfo("America/Los_Angeles"))
 scheduler.add_job(main, "cron", hour=15)
