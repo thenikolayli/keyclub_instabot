@@ -95,9 +95,7 @@ def get_event_fullness(docs_url, docs_service_param):
 
     # gets rows from each table and appends them
     for table in tables:
-        for row in table.get("tableRows"):
-            rows.append(row)
-        rows.append(table.get("tableRows"))
+        rows.extend(table.get("tableRows", []))
 
     # removes the first row because its the header row
     rows.pop(0)
@@ -112,8 +110,33 @@ def get_event_fullness(docs_url, docs_service_param):
             else:
                 volunteers += 1
         except AttributeError: pass
-
     return volunteers / (volunteers + empty)
+
+# returns the address on the sign up google doc
+def get_event_address(docs_url, docs_service_param):
+    docs_url = docs_url.split("id=")[1]
+    document = docs_service_param.documents().get(documentId=docs_url).execute()
+    body_content = document.get("body").get("content")
+    table = None
+
+    # gets the first table
+    for item in body_content:
+        if "table" in item:
+            table = item.get("table")
+            break
+
+    # goes through each row to find location row
+    for row in table.get("tableRows", []):
+        try:
+            col_name = row.get("tableCells")[0].get("content")[0].get("paragraph").get("elements")[0].get("textRun").get("content")
+
+            if "location" in col_name.lower():
+                location = ""
+                for element in row.get("tableCells")[1].get("content")[0].get("paragraph").get("elements"):
+                    location += element.get("textRun").get("content")
+                return location
+        except AttributeError: pass
+    return "No location provided."
 
 # returns whether or not an event has been posted before
 def in_current_events(event_title):
@@ -250,11 +273,18 @@ def get_events(calendar_service, docs_service, calendar_id):
         try:
             event_title = event.get("summary")
             event_description = event.get("description")
-            clean = re.compile("<[^>]+>")
-            event_description = re.sub(clean, "", event_description)
+            if event_description:
+                clean = re.compile("<[^>]+>")
+                event_description = re.sub(clean, "", event_description)
+            else:
+                event_description = "No description, check the sign up Google Doc for info!"
 
+            if not event.get("attachments"): # skip if no google doc attached to event
+                continue
             event_url = event.get("attachments")[0].get("fileUrl")
             event_address = event.get("location")
+            if not event_address:
+                event_address = get_event_address(event_url, docs_service)
 
             # skip if theres no start or end time
             if not event.get("start").get("dateTime"):
