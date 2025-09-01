@@ -1,10 +1,10 @@
 # Keyclub Instabot
 
 ## Files:
-- key.json - Google Service Account credentials file
-- current_events.json - List of events that are currently posted
-- .env - Environment variables
-- actions.log - Log of actions this bot has performed
+- `key.json` - Google Service Account credentials file
+- `current_events.json` - List of events that are currently posted (to prevent duplicates)
+- `.env` - Environment variables
+- `actions.log` - Log of actions this bot has performed
 
 ## Workflow:
 
