@@ -139,11 +139,13 @@ def get_event_address(docs_url, docs_service_param):
     return "No location provided."
 
 # returns whether or not an event has been posted before
-def in_current_events(event_title):
+def in_current_events(event_title, event_date):
     with open("current_events.json", "r") as file:
         current_events = json.load(file)
     for event in current_events:
-        if event.get("event_title") == event_title:
+        # checks if an event with the same title and date is currently posted
+        # (some events have the same name but different dates and vice versa)
+        if event.get("event_title") == event_title and event.get("event_date") == event_date:
             return True
     return False
 
@@ -298,7 +300,7 @@ def get_events(calendar_service, docs_service, calendar_id):
             event_fullness = get_event_fullness(event_url, docs_service)
             event_priority = ""
             # if event is too full, is already in the log (has been posted)
-            if event_fullness > .75 or in_current_events(event_title):
+            if event_fullness > .75 or in_current_events(event_title, event_date):
                 logging.info(f"Skipped fetching {event_title}: too full or already in current events")
                 continue
             elif event_fullness <= .25:
